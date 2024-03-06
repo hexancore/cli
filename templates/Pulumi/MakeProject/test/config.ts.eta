@@ -1,0 +1,5 @@
+import '@hexancore/common/testutil';
+
+process.on('unhandledRejection', (err) => {
+  console.log(err);
+});

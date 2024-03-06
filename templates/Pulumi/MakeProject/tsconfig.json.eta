@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@": [
+        "projects/<%= it.project %>/src"
+      ],
+      "@/*": [
+        "projects/<%= it.project %>/src/*"
+      ],
+      "@test/*": [
+        "projects/<%= it.project %>/test/helper/*"
+      ]
+    }
+  },
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./tsconfig.test.json"
+    },
+    {
+      "path": "./tsconfig.build.json"
+    }
+  ]
+}

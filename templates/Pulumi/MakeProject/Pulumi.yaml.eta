@@ -1,0 +1,7 @@
+name: <%= it.project %>
+description:
+runtime:
+  name: nodejs
+  options:
+    typescript: false
+main: ../../dist/<%= it.project %>/src/index.js
