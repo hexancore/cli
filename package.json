@@ -48,7 +48,7 @@
     "build": "rm -fr ./lib && tsc -p tsconfig.build.json",
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,test}/**/*.ts\" --fix",
-    "test": "jest --config ./.jestrc.json --runInBand",
+    "test": "jest --config .jestrc.json --runInBand",
     "test:clearCache": "jest --config .jestrc.json --clearCache",
     "test:unit": "jest --config .jestrc.json --runInBand  --group=unit",
     "test:watch": "jest --config .jestrc.json --runInBand --watchAll",
