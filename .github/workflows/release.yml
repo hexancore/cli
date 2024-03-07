@@ -31,14 +31,5 @@ jobs:
       - name: test
         uses: ./.github/actions/test
 
-      # Publish package
-      - name: Publish
-        shell: bash
-        run: |
-          echo -e "\nnpmAuthToken: '${{ env.NODE_AUTH_TOKEN }}'" >> ./.yarnrc.yml
-          yarn npm publish --access public --tag latest
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      #- name: publish
-      #  uses: ./.github/actions/publish
+      - name: publish
+        uses: ./.github/actions/publish
