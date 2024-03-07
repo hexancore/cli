@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { existsSync } from 'fs-extra';
 import path from 'path/posix';
 import type { IMonorepoHelper } from '../Project/IMonorepoHelper';
-import { DI } from '@/Constants';
+import { DI } from '../../Constants';
 import { OKA, type AR } from '@hexancore/common';
 import { FilesystemHelper } from '../Filesystem/FilesystemHelper';
 

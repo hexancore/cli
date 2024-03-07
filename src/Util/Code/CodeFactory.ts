@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { type ITemplateEngine } from '../TemplateEngine';
 import { FilesystemHelper } from '../Filesystem/FilesystemHelper';
 import path from 'path/posix';
-import { DI } from '@/Constants';
+import { DI } from '../../Constants';
 
 
 export interface CreateCodeOptions {
