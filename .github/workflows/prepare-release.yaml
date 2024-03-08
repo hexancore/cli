@@ -13,7 +13,7 @@ on:
           - major
 
 jobs:
-  release:
+  prepare-release:
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -25,11 +25,17 @@ jobs:
         env:
           HEXANCORE_BOT_TOKEN: ${{ secrets.HEXANCORE_BOT_TOKEN }}
 
-      - name: Yarn install
-        uses: hexancore/yarn-ci-install@0.1.0
+      - name: Configure Git user
+        run: |
+          git config --global user.email "153127894+hexancore-bot@users.noreply.github.com"
+          git config --global user.name "Hexancore Bot"
 
-      - name: test
-        uses: ./.github/actions/test
+      - name: Configure GPG
+        run: |
+          echo "${{ secrets.HEXANCORE_BOT_GPG_PRIVATE }}" | base64 -d | gpg --import
+          echo "${{ secrets.HEXANCORE_BOT_GPG_PASS }}" | gpg --passphrase-fd 0 --batch --yes --pinentry-mode loopback --command-fd 0
+          git config --global commit.gpgsign true
+          git config --global user.signingkey ${{ secrets.HEXANCORE_BOT_GPG_KEY_ID }}
 
       # Bump version
       - name: Bump package version
@@ -46,25 +52,19 @@ jobs:
         with:
           newVersion: '${{ env.NEW_VERSION }}'
 
-        # Publish package
-      - name: Publish
-        shell: bash
-        run: |
-          echo -e "\nnpmAuthToken: '${{ env.NODE_AUTH_TOKEN }}'" >> ./.yarnrc.yml
-          yarn npm publish --access public --tag ${{ env.RELEASE_TAG }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       # Commit
       - name: Commit CHANGELOG.md and package.json changes and create tag
         shell: bash
         run: |
-          git config --global user.email "153127894+hexancore-bot@users.noreply.github.com"
-          git config --global user.name "Hexancore Bot"
           git add "package.json"
           git add "CHANGELOG.md"
           git commit -m "chore: release ${{ env.NEW_VERSION }}"
-          git tag -m 'new version' ${{ env.NEW_VERSION }}
-          git push --follow-tags
-      #- name: publish
-      #  uses: ./.github/actions/publish
+          git push --follow-tags git push --set-upstream origin chore-prepare-release
+      - name: Create Pull Request
+        run: |
+          curl \
+          -X POST \
+          -H "Authorization: token ${{ secrets..HEXANCORE_BOT_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/${{ github.repository }}/pulls \
+          -d '{"title":"Prepare new version release: ${{ env.NEW_VERSION }}","head":"chore-prepare-release","base":"main","body":"Prepare new version release: ${{ env.NEW_VERSION }}"}'

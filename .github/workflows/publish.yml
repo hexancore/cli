@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseType:
+        description: 'Release type (one of): patch, minor, major'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  release:
+    permissions:
+      contents: write
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ env.HEXANCORE_BOT_TOKEN }}
+        env:
+          HEXANCORE_BOT_TOKEN: ${{ secrets.HEXANCORE_BOT_TOKEN }}
+
+      - name: Yarn install
+        uses: hexancore/yarn-ci-install@0.1.0
+
+      # Publish package
+      - name: Publish
+        shell: bash
+        run: |
+          echo -e "\nnpmAuthToken: '${{ env.NODE_AUTH_TOKEN }}'" >> ./.yarnrc.yml
+          yarn npm publish --provenance --access public --tag latest
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
