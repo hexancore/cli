@@ -1,4 +1,4 @@
-name: Release
+name: Prepare Release
 
 on:
   workflow_dispatch:
@@ -53,18 +53,18 @@ jobs:
           newVersion: '${{ env.NEW_VERSION }}'
 
       # Commit
-      - name: Commit CHANGELOG.md and package.json changes and create tag
+      - name: Commit CHANGELOG.md and package.json changes
         shell: bash
         run: |
           git add "package.json"
           git add "CHANGELOG.md"
           git commit -m "chore: release ${{ env.NEW_VERSION }}"
-          git push --follow-tags git push --set-upstream origin chore-prepare-release
+          git push git push --set-upstream origin chore-prepare-release
       - name: Create Pull Request
         run: |
           curl \
           -X POST \
-          -H "Authorization: token ${{ secrets..HEXANCORE_BOT_TOKEN }}" \
+          -H "Authorization: token ${{ secrets.HEXANCORE_BOT_TOKEN }}" \
           -H "Accept: application/vnd.github.v3+json" \
           https://api.github.com/repos/${{ github.repository }}/pulls \
           -d '{"title":"Prepare new version release: ${{ env.NEW_VERSION }}","head":"chore-prepare-release","base":"main","body":"Prepare new version release: ${{ env.NEW_VERSION }}"}'
