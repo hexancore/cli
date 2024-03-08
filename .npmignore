@@ -21,6 +21,7 @@ yarn.lock
 .jestrc.json
 config/
 CONTRIBUTION.md
+CHANGELOG.md
 tmp/
 docker-compose.yaml
 docker/

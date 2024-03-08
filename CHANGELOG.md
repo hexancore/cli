@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Release with gpg sign + generate provenance statements
+
+## [0.1.1] - 2024-03-07
+
 ### Fixed
 
 - code build
@@ -16,5 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial
 
-[unreleased] https://github.com/hexancore/cli/compare/0.1.0...HEAD   
-[0.1.0] https://github.com/hexancore/cli/releases/tag/0.1.0 
+[unreleased] https://github.com/hexancore/cli/compare/0.1.1...HEAD   
+[0.1.1] https://github.com/hexancore/core/compare/0.1.0...0.1.1    
+[0.1.0] https://github.com/hexancore/cli/releases/tag/0.1.0  
