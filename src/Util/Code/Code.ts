@@ -120,10 +120,7 @@ export class Code {
     }
 
     return this.render().onOk((output) => {
-      return ARW(this.fs.mkdirs(output.dirs))
-        .onOk(() => {
-          this.fs.outputFiles(output.files);
-        });
+      return this.fs.mkdirs(output.dirs).onOk(() => this.fs.outputFiles(output.files));
     });
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "@hexancore/cli",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "engines": {
     "node": ">=20"
   },
@@ -8,39 +8,18 @@
   "description": "CLI of Hexancore framework",
   "author": {
     "name": "Andrzej Wasiak",
-    "email": "contact@andrzejwasiak.pl",
     "url": "https://andrzejwasiak.pl"
   },
   "license": "MIT",
   "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "typesVersions": {
-    "*": {
-      ".": [
-        "./lib/index.d.ts"
-      ]
-    }
-  },
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./lib/index.d.ts",
-        "default": "./lib/index.js"
-      },
-      "default": {
-        "types": "./lib/index.d.ts",
-        "default": "./lib/index.js"
-      }
-    }
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hexancore/cli.git"
+    "url": "https://github.com/hexancore/cli.git"
   },
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://github.com/hexancore/cli.git",
+  "homepage": "https://github.com/hexancore/cli",
   "packageManager": "yarn@4.1.0",
   "scripts": {
     "hcli": "node --optimize_for_size --max_old_space_size=460 --gc_interval=100 ./lib/index.js",
@@ -96,5 +75,10 @@
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "5.3.3"
-  }
+  },
+  "files": [
+    "bin",
+    "lib",
+    "templates"
+  ]
 }
