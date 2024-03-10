@@ -21,6 +21,6 @@ jobs:
         shell: bash
         run: |
           echo -e "\nnpmAuthToken: '${{ env.NODE_AUTH_TOKEN }}'" >> ./.yarnrc.yml
-          yarn npm publish --provenance --access public --tag latest
+          npm publish --provenance --access public --tag latest
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
