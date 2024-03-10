@@ -16,6 +16,9 @@ jobs:
       - name: Yarn install
         uses: hexancore/yarn-ci-install@ba9baf131eba84b6c86efb46375a530a3098bb04
 
+      - name: Build
+        run: yarn build
+
       # Publish package
       - name: Publish
         shell: bash

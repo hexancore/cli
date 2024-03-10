@@ -39,7 +39,7 @@ export class PackageBumpVersionCommandHandler {
     if (typeof repositoryUrl !== 'string') {
       return ERR('core.cli.package.empty_repository_url');
     }
-    return OK(repositoryUrl.replace('.git', ''));
+    return OK(repositoryUrl.replace('.git', '').replace('git+', ''));
   }
 
   private updateChangelog(repositoryUrl: string, newVersion: string, releaseDate): AR<string> {

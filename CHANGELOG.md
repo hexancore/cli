@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.1.3
+
+### Fixed
+
+- publish action
+
 ## 0.1.2
 
 ### Changed
@@ -24,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial
 
-[unreleased] https://github.com/hexancore/cli/compare/0.1.1...HEAD   
+[unreleased] https://github.com/hexancore/cli/compare/0.1.3...HEAD   
+[0.1.3] https://github.com/hexancore/core/compare/0.1.2...0.1.3      
+[0.1.2] https://github.com/hexancore/core/compare/0.1.1...0.1.2     
 [0.1.1] https://github.com/hexancore/core/compare/0.1.0...0.1.1    
 [0.1.0] https://github.com/hexancore/cli/releases/tag/0.1.0  
