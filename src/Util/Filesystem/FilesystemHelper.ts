@@ -2,39 +2,55 @@ import * as fs from 'fs-extra';
 import { injectable } from 'inversify';
 import type { FileItem } from './FileItem';
 import { glob, type Options } from 'fast-glob';
-import { ARW, type AR } from '@hexancore/common';
+import { ARW, type AR, ERR } from '@hexancore/common';
 
 @injectable()
 export class FilesystemHelper {
-  
+
   public pathExists(path: string): boolean {
     return fs.pathExistsSync(path);
   }
 
-  public async mkdirs(dirs: string[]): Promise<void> {
-    await Promise.all(dirs.map((file: string) => this.mkdir(file)));
+  public mkdirs(dirs: string[]): AR<void> {
+    return ARW(Promise.all(dirs.map((file: string) => this.mkdir(file).p))).onOk((results) => {
+      const errors = results.filter((r) => r.isError());
+      if (errors.length > 0) {
+        return ERR('core.cli.fs.mkdirs', 500, errors);
+      }
+    });
   }
 
-  public async mkdir(dir: string): Promise<void> {
+  public mkdir(dir: string): AR<void> {
     const mode = 0o2775;
-    await fs.ensureDir(dir, mode);
+    return ARW(fs.ensureDir(dir, mode));
   }
 
-  public async outputFiles(files: FileItem[]): Promise<void> {
-    await Promise.all(files.map((file: FileItem) => this.outputFile(file)));
+  public outputFiles(files: FileItem[]): AR<void> {
+    return ARW(Promise.all(files.map((file: FileItem) => this.outputFile(file).p))).onOk((results) => {
+      const errors = results.filter((r) => r.isError());
+      if (errors.length > 0) {
+        return ERR('core.cli.fs.output_files', 500, errors);
+      }
+    });
   }
 
-  public async outputFile(file: FileItem): Promise<void> {
-    return fs.outputFile(file.path, file.content);
+  public outputFile(path: FileItem | string, content?: string | (() => AR<string>)): AR<void> {
+    const file = typeof path === 'object' ? path : { path, content };
+    return ARW(fs.outputFile(file.path, file.content));
   }
 
-  public async readFile(path: string): Promise<string> {
-    const buffer = await fs.readFile(path);
-    return buffer.toString('utf8');
+  public readTextFile(path: string, encoding: BufferEncoding = 'utf8'): AR<string> {
+    return ARW(fs.readFile(path)).onOk((buffer) => {
+      return buffer.toString(encoding);
+    });
   }
 
   public readJson<T = any>(path: string): AR<T> {
-    return ARW(this.readFile(path)).onOk(content => JSON.parse(content));
+    return this.readTextFile(path).onOk(content => JSON.parse(content));
+  }
+
+  public getFileLines(path: string): AR<string[]> {
+    return this.readTextFile(path).onOk((text) => text.split('\n'));
   }
 
   public fastGlob(patterns: string | string[], options: Options): AR<string[]> {

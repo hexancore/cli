@@ -12,13 +12,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ env.HEXANCORE_BOT_TOKEN }}
-        env:
-          HEXANCORE_BOT_TOKEN: ${{ secrets.HEXANCORE_BOT_TOKEN }}
 
       - name: Yarn install
-        uses: hexancore/yarn-ci-install@0.1.0
+        uses: hexancore/yarn-ci-install@ba9baf131eba84b6c86efb46375a530a3098bb04
 
       # Publish package
       - name: Publish

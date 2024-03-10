@@ -3,7 +3,6 @@ import 'reflect-metadata';
 import registerCommands from './Command/registerCommands';
 import { CLI_VERSION, DI } from './Constants';
 import { HcCliContainerBuilder } from './DI';
-import { styles, type IMonorepoHelper } from './Util';
 
 function main() {
   const cli = new Command();
@@ -13,11 +12,6 @@ function main() {
 
   const cwd = process.cwd().replaceAll('\\', '/');
   const c = HcCliContainerBuilder.create(cwd).build();
-
-  if (!c.get<IMonorepoHelper>(DI.monorepoHelper).isMonorepoRootDir(cwd)) {
-    console.log(styles.danger('Current dir is not monorepo root dir!'));
-    return;
-  }
   registerCommands(cli, c);
   return cli.parseAsync(process.argv);
 }
