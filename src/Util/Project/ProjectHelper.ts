@@ -5,6 +5,8 @@ import type { Code } from '../Code/Code';
 import { CommonHelpers } from '../CommonHelpers';
 import type { MultiPromptOptions } from '../Prompt/EnquirerTypes';
 import { ProjectError } from './ProjectError';
+import { PromptHelper } from '../Prompt';
+import { styles } from '../ConsoleHelper';
 
 const PROJECT_NAME_REGEX = /^[a-z][a-z0-9-/]+$/;
 
@@ -12,12 +14,19 @@ const PROJECT_NAME_REGEX = /^[a-z][a-z0-9-/]+$/;
 export class ProjectHelper {
   private projectsCachePath: string;
   private projects: string[];
+  private projectTypeMessagePrefixes: any;
 
   public constructor(
     @inject(CommonHelpers) private helpers: CommonHelpers,
     private useCache = false,
   ) {
     this.projectsCachePath = Path.join(this.helpers.rootDir, 'node_modules/.hcli/projects.json');
+
+    this.projectTypeMessagePrefixes = {
+      apps: (name) => '🚀 ' + name + styles.hintChoiceText(' (Application)'),
+      libs: (name) => '📚 ' + name + styles.hintChoiceText(' (Library)'),
+      projects: (name) => '⚙️ ' + name + styles.hintChoiceText(' (Project)')
+    };
   }
 
 
@@ -56,19 +65,44 @@ export class ProjectHelper {
   }
 
   public promptProject(): AR<string> {
-    return this.getProjectPromptOptions().onOk((options) => this.helpers.prompt({ project: options }).onOk((r) => r.project));
+    return this.getProjectPromptOptions().onOk((options) => this.helpers.promptOne<string>(options));
   }
 
-  public getProjectPromptOptions(): AR<MultiPromptOptions> {
-    return this.getProjects().onOk((projects) => {
-      return {
-        type: 'autocomplete',
-        message: 'Select Project',
-        initial: 0,
-        choices: projects,
-      };
-    });
+  public promptLib(): AR<string> {
+    return this.getProjectPromptOptions({ singleProjectType: 'lib' }).onOk((options) => this.helpers.promptOne<string>(options));
+  }
 
+  public promptApp(): AR<string> {
+    return this.getProjectPromptOptions({ singleProjectType: 'app' }).onOk((options) => this.helpers.promptOne<string>(options));
+  }
+
+
+  public getProjectPromptOptions(options?: { singleProjectType: 'app' | 'lib'; }): AR<MultiPromptOptions> {
+    if (options?.singleProjectType) {
+      switch (options.singleProjectType) {
+        case 'app': return this.helpers.monorepo.getApps().onOkBind(this.prepareProjectsPrompt, this);
+        case 'lib': return this.helpers.monorepo.getApps().onOkBind(this.prepareProjectsPrompt, this);
+      }
+    }
+
+    return this.helpers.monorepo.getProjects().onOkBind(this.prepareProjectsPrompt, this);
+  }
+
+  private prepareProjectsPrompt(projects: string[]) {
+    if (projects.length === 0) {
+      return ERR(ProjectError.noProjects());
+    }
+
+    return PromptHelper.autocomplete({
+      message: 'Select Project 📦',
+      validate: undefined,
+      choices: projects.map((p) => {
+        const type = p.substring(0, 4);
+        console.log(type);
+        const name = p.substring(5).replaceAll('/', '-');
+        return { name: p, message: this.projectTypeMessagePrefixes[type](name), value: p };
+      })
+    });
   }
 
   public getProjects(): AR<string[]> {
@@ -100,9 +134,5 @@ export class ProjectHelper {
       this.helpers.fs.outputFile({ path: this.projectsCachePath, content: JSON.stringify(this.projects) });
       return this.projects;
     });
-  }
-
-  public isMonorepo(): boolean {
-    return this.helpers.isMonorepo();
   }
 }

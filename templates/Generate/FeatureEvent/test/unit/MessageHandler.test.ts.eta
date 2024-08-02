@@ -1,0 +1,29 @@
+import { mocks, mock, M } from '@hexancore/mocker';
+import { OKA, OK, ERR  } from '@hexancore/common';
+import { <%=it.messageClassName%> } from '@/<%=it.featureImportName%>/<%=it.messagePath%>/<%=it.messageClassName%>';
+import { <%=it.messageClassName%>Handler } from '@/<%=it.featureImportName%>/<%=it.messagePath%>/<%=it.messageClassName%>Handler';
+
+/**
+ * @group unit
+ * @group feature/<%=it.featureImportName%>
+ * @group unit/<%=it.featureImportName%>
+ */
+describe('<%=it.featureName%>.<%=it.messageType%>.<%=it.context%>.<%=it.name%>', () => {
+  let handler: <%=it.messageClassName%>Handler;
+
+  beforeEach(() => {
+    handler = new <%=it.messageClassName%>Handler();
+  });
+
+  afterEach(() => {
+
+  });
+
+  test('execute()', async () => {
+    const <%=it.messageType.toLowerCase()%> = new <%=it.messageClassName%>();
+
+    await handler.execute(<%=it.messageType.toLowerCase()%>);
+
+    fail('Need implementation');
+  });
+});

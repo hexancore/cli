@@ -1,4 +1,4 @@
-import { ARW, type AR, OKA } from '@hexancore/common';
+import { ARW, type AR } from '@hexancore/common';
 import * as Path from 'path/posix';
 import type { FileItem } from '../Filesystem/FileItem';
 import type { FilesystemHelper } from '../Filesystem/FilesystemHelper';
@@ -20,7 +20,7 @@ export class Code {
 
   public constructor(
     public readonly rootDir: string,
-    public readonly module: string | null,
+    public readonly feature: string | null,
     protected templateRoot: string,
     protected context: Record<string, any>,
     protected templateEngine: ITemplateEngine,
@@ -30,8 +30,8 @@ export class Code {
     this.files = [];
   }
 
-  public get moduleClassPrefix(): string {
-    return this.module;
+  public get featureClassPrefix(): string {
+    return this.feature;
   }
 
   public dir(path: string, addGitKeep = false): this {
@@ -42,7 +42,8 @@ export class Code {
     return this;
   }
 
-  public srcTemplateFile(templateFilePath: string, outFilePath: string, context?: Record<string, any>): this {
+  public srcTemplateFile(templateFilePath: string, outFilePath?: string, context?: Record<string, any>): this {
+    outFilePath = outFilePath ?? templateFilePath;
     templateFilePath = Path.join('src', templateFilePath);
     return this.templateFile(templateFilePath, this.getSrcPath(outFilePath), context);
   }
@@ -100,17 +101,17 @@ export class Code {
   }
 
   protected getPath(prefix: string, path: string): string {
-    return this.isModule() ? Path.join(prefix, this.module, path) : Path.join(prefix, path);
+    return this.isModule() ? Path.join(prefix, this.feature, path) : Path.join(prefix, path);
   }
 
   public isModule(): boolean {
-    return this.module !== null;
+    return this.feature !== null;
   }
 
   public print(): AR<void> {
     return this.render().onOk((output) => {
       console.log('Dirs:\n' + output.dirs.join('\n'));
-      console.log('Files:\n' + output.files.map((f) => `### ${f.path} ###\n${f.content}\n### END ###\n`).join('\n'));
+      console.log('Files:\n' + output.files.map((f) => `### ${f.path} ###\n${f.content as string}\n### END ###\n`).join('\n'));
     });
   }
 

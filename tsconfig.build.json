@@ -6,7 +6,7 @@
     "sourceMap": false,
     "incremental": false,
   },
-  "files": null,
+  "files": [],
   "include": ["src/**/*"]
 }
 

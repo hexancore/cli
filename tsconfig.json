@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "noImplicitThis": false,
     "noImplicitAny": false,
     "importHelpers": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -32,7 +32,7 @@
   },
   "files": ["node_modules/jest-expect-message/types/index.d.ts"],
   "include": ["src/**/*", "test/**/*", ".eslintrc.js"],
-  "exclude": ["node_modules", "lib"],
+  "exclude": ["node_modules", "lib", "tmp"],
 
   "typedocOptions": {
     "mode": "file",

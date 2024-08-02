@@ -3,8 +3,8 @@ import TmpDirHelper from '@test/TmpDirHelper';
 import { writeFileSync } from 'fs-extra';
 import path from 'path/posix';
 
-describe('PromptHelper', () => {
-  let rootDir;
+describe('NxHelper', () => {
+  let rootDir: string;
   let helper: NxHelper;
   beforeEach(() => {
     rootDir = TmpDirHelper.recreate('NxHelper');

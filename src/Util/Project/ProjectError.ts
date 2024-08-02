@@ -3,7 +3,8 @@ import { AppError, AppErrorCode, type DefineErrorsUnion } from '@hexancore/commo
 export const ProjectErrors = {
   invalidName: 'core.cli.project.invalid_name',
   notExists: 'core.cli.project.not_exists',
-  exists: 'core.cli.project.exists'
+  exists: 'core.cli.project.exists',
+  no_projects: 'core.cli.project.no_projects',
 } as const;
 
 export type ProjectErrors<
@@ -38,6 +39,14 @@ export class ProjectError {
       type: ProjectErrors.exists,
       code: AppErrorCode.BAD_REQUEST,
       message: `Project exists in ${path}`,
+    });
+  }
+
+  public static noProjects(): AppError {
+    return new AppError({
+      type: ProjectErrors.no_projects,
+      code: AppErrorCode.BAD_REQUEST,
+      message: 'No project in current root',
     });
   }
 }

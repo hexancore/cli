@@ -2,11 +2,18 @@ import { OKA, type AR } from '@hexancore/common';
 import type { IMonorepoHelper } from '../Project';
 
 export class TestMonorepoHelper implements IMonorepoHelper {
-
+  
   public projects = ['crazy', 'mad', 'insane'];
 
   public getPackageScope(): AR<string> {
     return OKA('@test_scope');
+  }
+
+  public getApps(): AR<string[]> {
+    return OKA(this.projects);
+  }
+  public getLibs(): AR<string[]> {
+    return OKA(this.projects);
   }
 
   public getProjects(): AR<string[]> {

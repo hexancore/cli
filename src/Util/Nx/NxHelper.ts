@@ -9,6 +9,7 @@ import { FilesystemHelper } from '../Filesystem/FilesystemHelper';
 @injectable()
 export class NxHelper implements IMonorepoHelper {
   private projects: string[];
+
   public constructor(
     @inject(DI.rootDir) private rootDir: string,
     private fs: FilesystemHelper,
@@ -16,18 +17,41 @@ export class NxHelper implements IMonorepoHelper {
 
   }
 
+
   public getPackageScope(): AR<string> {
     return this.fs.readJson(path.join(this.rootDir, 'package.json')).onOk((data: { name: string }) => {
       return data.name.split('/')[0];
     });
   }
 
+  public getApps(): AR<string[]> {
+    return this.fs.fastGlob('apps/**/project.json', {
+      deep: 3,
+      cwd: this.rootDir,
+      onlyFiles: true,
+      concurrency: 2,
+    }).onOk(projects => {
+      return projects.map((p) => p.substring(0, p.lastIndexOf('/'))).sort();
+    });
+  }
+
+  public getLibs(): AR<string[]> {
+    return this.fs.fastGlob('libs/**/project.json', {
+      deep: 3,
+      cwd: this.rootDir,
+      onlyFiles: true,
+      concurrency: 2,
+    }).onOk(projects => {
+      return projects.map((p) => p.substring(0, p.lastIndexOf('/'))).sort();
+    });
+  }
+
   public getProjects(): AR<string[]> {
     if (!this.projects) {
       return this.fs.fastGlob([
-        'projects/**/package.json',
-        'apps/**/package.json',
-        'libs/**/package.json',
+        'projects/**/project.json',
+        'apps/**/project.json',
+        'libs/**/project.json',
       ], {
         deep: 3,
         cwd: this.rootDir,
@@ -42,10 +66,12 @@ export class NxHelper implements IMonorepoHelper {
   }
 
   public isMonorepoRootDir(dir: string): boolean {
-    return this.isNxMonorepo(dir);
+    return NxHelper.isNxMonorepo(dir);
   }
 
-  public isNxMonorepo(rootDir: string): boolean {
+  public static isNxMonorepo(rootDir: string): boolean {
     return existsSync(path.join(rootDir, 'nx.json'));
   }
+
+
 }

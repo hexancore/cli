@@ -2,7 +2,11 @@ import * as fs from 'fs-extra';
 import { injectable } from 'inversify';
 import type { FileItem } from './FileItem';
 import { glob, type Options } from 'fast-glob';
-import { ARW, type AR, ERR } from '@hexancore/common';
+import { ARW, type AR, ERR, OK } from '@hexancore/common';
+import path from 'node:path/posix';
+
+
+const DIR_LIST_GLOB_OPTS = { deep: 1, onlyDirectories: true };
 
 @injectable()
 export class FilesystemHelper {
@@ -31,12 +35,23 @@ export class FilesystemHelper {
       if (errors.length > 0) {
         return ERR('core.cli.fs.output_files', 500, errors);
       }
+
+      return OK(true) as any;
     });
   }
 
-  public outputFile(path: FileItem | string, content?: string | (() => AR<string>)): AR<void> {
-    const file = typeof path === 'object' ? path : { path, content };
-    return ARW(fs.outputFile(file.path, file.content));
+  public outputFile(path: FileItem | string, content?: FileItem['content']): AR<void> {
+    let file = typeof path === 'object' ? path : { path, content };
+    if (typeof file.content === 'string') {
+      return ARW(fs.outputFile(file.path, file.content));
+    }
+
+    if (typeof file.content === 'function') {
+      file = { path: file.path, content: file.content() };
+    }
+
+    return (file.content as AR<string>).onOk(content => ARW(fs.outputFile(file.path, content)));
+
   }
 
   public readTextFile(path: string, encoding: BufferEncoding = 'utf8'): AR<string> {
@@ -62,6 +77,15 @@ export class FilesystemHelper {
       stats: false,
       ...options
     };
-    return ARW(glob(patterns, options));
+    return ARW(glob(patterns, options)).onOk((paths) => paths.map(p => p.replaceAll('\\', '/')));
+  }
+
+  public dirList(dir: string | string[], fullPaths?: boolean): AR<string[]> {
+    dir = Array.isArray(dir) ? path.join(...dir) : dir;
+    return this.fastGlob(dir + '/*', DIR_LIST_GLOB_OPTS)
+      .onOk((dirs) => {
+        dirs = fullPaths ? dirs : dirs.map(p => path.basename(p));
+        return dirs.sort(); // NOSONAR;
+      });
   }
 }
