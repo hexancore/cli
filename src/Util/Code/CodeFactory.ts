@@ -8,7 +8,7 @@ import { DI } from '../../Constants';
 
 export interface CreateCodeOptions {
   project: string;
-  module?: string;
+  feature?: string;
   templateRoot: string;
   context: Record<string, any>;
 }
@@ -25,6 +25,6 @@ export class CodeFactory {
 
   public create(options: CreateCodeOptions): Code {
     const rootDir = options.project === '' ? this.rootDir : path.join(this.rootDir, options.project);
-    return new Code(rootDir, options.module, options.templateRoot, options.context, this.templateEngine, this.fs);
+    return new Code(rootDir, options.feature, options.templateRoot, options.context, this.templateEngine, this.fs);
   }
 }

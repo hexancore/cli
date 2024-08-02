@@ -1,21 +1,27 @@
 import { DI } from '../Constants';
-import { inject, injectable } from 'inversify';
+import { inject, injectable, optional } from 'inversify';
 import { CodeFactory, type Code, type CreateCodeOptions } from './Code';
 import { FilesystemHelper } from './Filesystem';
 import { PromptHelper, type MultiPromptOptions } from './Prompt';
-import type { AR } from '@hexancore/common/lib/mjs';
-import type { IMonorepoHelper } from './Project';
+import type { AR } from '@hexancore/common';
+import { IMonorepoHelper, ProjectHelper } from './Project';
+import { FeatureHelper } from './Feature';
 
 @injectable()
 export class CommonHelpers {
+
+  public projectHelper: ProjectHelper;
+  public featureHelper: FeatureHelper;
+
   public constructor(
-    @inject(DI.rootDir) public readonly rootDir: string,
-    @inject(FilesystemHelper) public readonly fs: FilesystemHelper,
+    @inject(DI.rootDir) public rootDir: string,
+    @inject(FilesystemHelper) public fs: FilesystemHelper,
     @inject(CodeFactory) private codeFactory: CodeFactory,
     @inject(PromptHelper) private promptHelper: PromptHelper,
-    @inject(DI.monorepoHelper) public readonly monorepo?: IMonorepoHelper,
+    @inject(DI.monorepoHelper) @optional() public monorepo?: IMonorepoHelper,
   ) {
-
+    this.projectHelper = new ProjectHelper(this, false);
+    this.featureHelper = new FeatureHelper(this, this.projectHelper);
   }
 
   public getCode(options: CreateCodeOptions): Code {
@@ -26,7 +32,11 @@ export class CommonHelpers {
     return this.promptHelper.prompt(questions);
   }
 
+  public promptOne<R>(question: MultiPromptOptions): AR<R> {
+    return this.promptHelper.promptOne(question);
+  }
+
   public isMonorepo(): boolean {
-    return this.monorepo !== null;
+    return this.monorepo !== undefined;
   }
 }

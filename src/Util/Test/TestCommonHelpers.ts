@@ -3,7 +3,7 @@ import { CommonHelpers } from '../CommonHelpers';
 import { FilesystemHelper } from '../Filesystem';
 import type { MultiPromptOptions, PromptHelper } from '../Prompt';
 import { TestMonorepoHelper } from './FakeMonorepoHelper';
-import { OKA } from '@hexancore/common/lib/mjs';
+import { OKA } from '@hexancore/common';
 import { TestTemplateEngine } from './FakeTemplateEngine';
 import { CodeFactory } from '../Code';
 

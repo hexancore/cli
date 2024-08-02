@@ -1,24 +1,19 @@
-import { ERR, OK, OKA, type AR, type R } from '@hexancore/common';
+import { AbstractCommandHandler, type FileItem } from '../../Util';
+import { AsyncResult, ERR, OK, OKA, type AR, type R } from '@hexancore/common';
 import { LocalDate, ZoneOffset } from '@js-joda/core';
-import { inject, injectable } from 'inversify';
-import { FilesystemHelper, type FileItem } from '../../Util';
+import { injectable } from 'inversify';
 import { Changelog } from '../../Util/Changelog/Changelog';
 
 interface PackageBumpVersionCommandOptions {
   dryRun?: true;
   newVersion: string;
-  releaseDate?: string
+  releaseDate?: string;
 }
 
 @injectable()
-export class PackageBumpVersionCommandHandler {
-  public constructor(
-    @inject(FilesystemHelper) private fs: FilesystemHelper
-  ) {
-  }
-
-  public execute(options: PackageBumpVersionCommandOptions): AR<void> {
-    return this.fs.readJson('package.json').onOk(packageJson => {
+export class PackageBumpVersionCommandHandler extends AbstractCommandHandler<PackageBumpVersionCommandOptions> {
+  public execute(options: PackageBumpVersionCommandOptions, _args: string[]): AR<void> {
+    return this.helpers.fs.readJson('package.json').onOk(packageJson => {
       packageJson.version = options.newVersion;
       const repositoryUrl = this.extractReposiotryUrlFromPackageJson(packageJson);
       if (repositoryUrl.isError()) {
@@ -29,9 +24,9 @@ export class PackageBumpVersionCommandHandler {
       const updatedChangelog = this.updateChangelog(repositoryUrl.v, options.newVersion, releaseDate);
       return this.save([
         { path: 'package.json', content: JSON.stringify(packageJson, null, 2) },
-        { path: 'CHANGELOG.md', content: () => updatedChangelog },
+        { path: 'CHANGELOG.md', content: updatedChangelog },
       ], options.dryRun);
-    });
+    }).onOk(() => true as any);
   }
 
   private extractReposiotryUrlFromPackageJson(packageJson: Record<string, any>): R<string> {
@@ -43,7 +38,7 @@ export class PackageBumpVersionCommandHandler {
   }
 
   private updateChangelog(repositoryUrl: string, newVersion: string, releaseDate): AR<string> {
-    return this.fs.getFileLines('CHANGELOG.md').onOk((lines) => {
+    return this.helpers.fs.getFileLines('CHANGELOG.md').onOk((lines) => {
       const changelog = new Changelog(repositoryUrl, lines);
       changelog.updateWithNewVersion(newVersion, releaseDate);
       return changelog.toString();
@@ -52,19 +47,22 @@ export class PackageBumpVersionCommandHandler {
 
   private save(files: FileItem[], dryRun: boolean): AR<void> {
     if (dryRun) {
+      console.log('Files:\n');
       return OKA(files).onEachAsArray((item) => {
-        if (typeof item.content === 'function') {
-          return item.content().onOk((content) => {
-            console.log('Files:\n' + `### ${item.path} ###\n${content}\n### END ###\n\n`);
-          });
-        } else {
-          console.log('Files:\n' + `### ${item.path} ###\n${item.content}\n### END ###\n\n`);
-          return OK(undefined);
+        if (typeof item.content === 'string') {
+          console.log(`### ${item.path} ###\n${item.content}\n### END ###\n\n`);
+          return OK(true) as any;
         }
 
-      }).onOk(() => { });
+        const content: AsyncResult<string> = (item.content instanceof AsyncResult) ? item.content : item.content();
+        return content.onOk(content => {
+          console.log(`### ${item.path} ###\n${content}\n### END ###\n\n`);
+          return OK(true) as any;
+        });
+
+      }).onOk(() => OK(true) as any);
     }
 
-    return this.fs.outputFiles(files);
+    return this.helpers.fs.outputFiles(files).onOk(() => OK(true) as any);
   }
 }

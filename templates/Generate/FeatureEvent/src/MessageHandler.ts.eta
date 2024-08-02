@@ -1,0 +1,13 @@
+import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+import { ARP, OKAP, OK, OKA, ERR  } from '@hexancore/common';
+import { <%=it.messageClassName%> } from './<%=it.messageClassName%>';
+
+@EventsHandler(<%=it.messageClassName%>)
+export class <%=it.messageClassName%>Handler implements I<%=it.messageType%>Handler<<%=it.messageClassName%>> {
+  public constructor() {}
+
+  public execute(<%=it.messageType.toLowerCase()%>: <%=it.messageClassName%>): ARP<boolean> {
+    throw new Error("need implementation");
+    return OKAP(true);
+  }
+}

@@ -1,0 +1,7 @@
+import { Module } from '@nestjs/common';
+import { CoreDomainInfraModule } from '../../../Core/Infrastructure/CoreDomainInfraModule';
+
+@Module({
+  imports: [CoreDomainInfraModule]
+})
+export class FeatureDomainInfraModule { }
