@@ -35,7 +35,8 @@ export class CliBuilder {
   }
 
   private createActionHandlerOfCommandHandler(handler: AbstractCommandHandler<any>): any {
-    return this.actionWrapper((args: string[], options: Record<string, any>) => handler.execute(options, args) as any);
+
+    return this.actionWrapper((args: string[], options: Record<string, any>) => handler.execute(options, ...args) as any);
   }
 
   private actionWrapper(action: (args: string[], options: Record<string, any>) => AR<void>): ((...args: any[]) => Promise<void>) {

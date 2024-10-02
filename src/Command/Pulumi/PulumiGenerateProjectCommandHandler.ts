@@ -11,7 +11,7 @@ const PULUMI_PROJECTS_DIR = 'projects';
 @injectable()
 export class PulumiGenerateProjectCommandHandler extends AbstractCommandHandler<PulumiGenerateProjectCommandOptions> {
 
-  public execute(options: PulumiGenerateProjectCommandOptions, _args: string[]): AR<void> {
+  public execute(options: PulumiGenerateProjectCommandOptions): AR<void> {
     return this.prompt().onOk((promptResult) => {
       const project = promptResult.project;
       const projectPath = PULUMI_PROJECTS_DIR + '/' + project;

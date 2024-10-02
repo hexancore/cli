@@ -6,24 +6,23 @@ import { Changelog } from '../../Util/Changelog/Changelog';
 
 interface PackageBumpVersionCommandOptions {
   dryRun?: true;
-  newVersion: string;
   releaseDate?: string;
 }
 
 @injectable()
 export class PackageBumpVersionCommandHandler extends AbstractCommandHandler<PackageBumpVersionCommandOptions> {
-  public execute(options: PackageBumpVersionCommandOptions, _args: string[]): AR<void> {
+  public execute(options: PackageBumpVersionCommandOptions, newVersion: string): AR<void> {
     return this.helpers.fs.readJson('package.json').onOk(packageJson => {
-      packageJson.version = options.newVersion;
+      packageJson.version = newVersion;
       const repositoryUrl = this.extractReposiotryUrlFromPackageJson(packageJson);
       if (repositoryUrl.isError()) {
         return ERR(repositoryUrl.e);
       }
       const releaseDate: string = options.releaseDate ?? LocalDate.now(ZoneOffset.UTC).toString();
 
-      const updatedChangelog = this.updateChangelog(repositoryUrl.v, options.newVersion, releaseDate);
+      const updatedChangelog = this.updateChangelog(repositoryUrl.v, newVersion, releaseDate);
       return this.save([
-        { path: 'package.json', content: JSON.stringify(packageJson, null, 2) },
+        { path: 'package.json', content: JSON.stringify(packageJson, null, 2) + '\n' },
         { path: 'CHANGELOG.md', content: updatedChangelog },
       ], options.dryRun);
     }).onOk(() => true as any);

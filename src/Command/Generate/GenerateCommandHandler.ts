@@ -17,7 +17,7 @@ export class GenerateCommandHandler extends AbstractCommandHandler<GenerateComma
     this.generatorChoices = Array.from(generators.values()).map(g => g.choice);
   }
 
-  public execute(options: GenerateCommandOptions, _args: string[]): AR<void> {
+  public execute(options: GenerateCommandOptions): AR<void> {
     if (!this.helpers.isMonorepo()) {
       printError('Current directory is not Monorepo(Nx)');
       process.exit(1);
@@ -34,7 +34,7 @@ export class GenerateCommandHandler extends AbstractCommandHandler<GenerateComma
       initial: 0,
       choices: this.generatorChoices,
       suggest(input: string, choices: Choice[]) {
-        const found = choices.filter((c) => (c.name as string).toLowerCase().startsWith(input));
+        const found = choices.filter((c) => c.name.toLowerCase().startsWith(input));
         return found;
       }
     }));
